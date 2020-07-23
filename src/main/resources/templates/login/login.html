@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="text/html;charset=UTF-8"/>
+    <title>登录页面</title>
+    <script type="text/javascript" language="JavaScript" src="/js/jquery-1.6.2.min.js"></script>
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+        }
+        .starter-template {
+            padding: 40px 15px;
+            text-align: center;
+        }
+    </style>
+    <!-- CSRF -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <!-- default header name is X-CSRF-TOKEN -->
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/home/home"> 首页 </a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</nav>
+<div class="container">
+    <div class="starter-template">
+        <h2>使用账号密码登录</h2>
+            <div class="form-group">
+                <label for="username">账号</label>
+                <input type="text" class="form-control" id="username" name="username" value="" placeholder="账号" />
+            </div>
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" class="form-control" id="password" name="password" placeholder="密码" />
+            </div>
+
+        <div class="form-group">
+            <label for="password">记住登录</label>
+            <input type="checkbox" name="is_remember_me"  id="is_remember_me" value="true" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">验证码</label>
+            <img id="kaptcha" alt="验证码" onclick = "refresh_kaptcha()" src="/image/defaultkaptcha" /><br/>
+            <input type="text" id="vrifyCode" name="vrifyCode" placeholder="验证码" />
+        </div>
+<!--
+        <tr><td></td>
+            <td>记住登录
+            </td></tr>
+
+
+        <tr><td>验证码</td>
+            <td> <img id="kaptcha" alt="验证码" onclick = "refresh_kaptcha()" src="/image/defaultKaptcha" />
+                <br/>
+                <input type="text" id="vrifyCode" name="vrifyCode" placeholder="验证码" />
+            </td>
+        </tr>
+-->
+
+            <button name="formsubmit" value="登录" onclick="go_login()" >登录</button>
+    </div>
+</div>
+
+<script>
+
+    function refresh_kaptcha() {
+        document.getElementById("kaptcha").src='/image/defaultkaptcha?d='+new Date();
+    }
+
+    function go_login(){
+        if ($("#username").val() == "") {
+            alert('用户名不可为空');
+            $("#username").focus();
+            return false;
+        }
+        if ($("#password").val() == "") {
+            alert('密码不可为空');
+            $("#password").focus();
+            return false;
+        }
+
+
+        if ($("#vrifyCode").val() == "") {
+            alert('验证码不可为空');
+            $("#vrifyCode").focus();
+            return false;
+        }
+
+        var rememberme_val = false;
+        if (document.getElementById('is_remember_me').checked == true) {
+            rememberme_val = true;
+        }
+
+
+
+        var postdata = {
+            username:$("#username").val(),
+            password:$("#password").val(),
+            vrifyCode:$("#vrifyCode").val(),
+            'remember-me':rememberme_val
+        }
+        var csrfToken = $("meta[name='_csrf']").attr("content");
+        var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+        $.ajax({
+            type:"POST",
+            //type:"GET",
+            url:"/login/logined",
+            data:postdata,
+            //返回数据的格式
+            datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".
+            beforeSend: function(request) {
+                request.setRequestHeader(csrfHeader, csrfToken); // 添加  CSRF Token
+            },
+            success:function(data){
+                if (data.code == 0) {
+                    //
+                    alert('login success:'+data.msg);
+                    window.location.href="/home/home";
+                } else {
+                    alert("failed:"+data.msg);
+                    //window.location.href="/login/login";
+                }
+            },
+            //调用执行后调用的函数
+            complete: function(XMLHttpRequest, textStatus){
+            },
+            //调用出错执行的函数
+            error: function(){
+                //请求出错处理
+                alert('error');
+            }
+        });
+
+    }
+</script>
+
+
+
+</body>
+</html>

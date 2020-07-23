@@ -1,0 +1,16 @@
+<div style="background: #eeeeff;" th:fragment="topmenu">
+    <div style="width:500px;float:left;height:100px;background:#eeeeee;">
+        <div style="width:100px;float:left;"><a href="/home/home">首页</a></div>
+        <div style="width:100px;float:left;"><a href="/admin/home/">管理员首页</a></div>
+        <div style="width:100px;float:left;"><a href="/merchant/home/">商户首页</a></div>
+    </div>
+    <div th:if="${is_login} eq '1'" style="width:320px;float:right;">
+        <div style="width:100px;float:left;text-align: center;"><a href="/user/setpass/">修改密码</a></div>
+        <div style="width:120px;float:left;text-align: center;">欢迎,<span th:text="${login_username}"></span></div>
+        <div style="width:100px;float:left;text-align: center;">
+            <a href="javascript:go_logout()">退出</a>
+        </div>
+
+    </div>
+    <div  th:if="${is_login} ne '1'" style="width:300px;float:right;">未登录，点击<a href="/login/login">这里</a>登录</div>
+</div>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="common/header :: header">
+</head>
+<body>
+<div style="width:100%;height:100px;background: #eeeeff;font-size: 16px;" th:include="common/topMenu :: topmenu"></div>
+<div id="content" style="width:800px;">
+    <div style="width:250px;float:left;font-size: 16px;" ></div>
+    <div style="width:550px;float:left;">
+
+        <form action="" method="post">
+
+            <table>
+                <tr><td>user name</td><td th:text="${current_user}">
+                </td></tr>
+                <tr><td>orig password</td><td>
+                    <input type="password" id="origPassword" name="origPassword" />
+                </td></tr>
+                <tr><td>new password</td><td>
+                    <input type="password" id="newPassword" name="newPassword" />
+                </td></tr>
+                <tr><td>repeat new password</td><td>
+                    <input type="password" id="reNewPassword" name="reNewPassword" />
+                </td></tr>
+                <tr><td colspan="2">
+                    <input type="button" name="go" value="save" onclick="go_save()" />
+                </td></tr>
+            </table>
+
+        </form>
+    </div>
+</div>
+
+<script>
+    function go_save(){
+        if ($("#origPassword").val().trim().length < 6) {
+            alert('orig password length is not enough');
+            $("#origPassword").focus();
+            return false;
+        }
+        if ($("#newPassword").val().trim().length < 6) {
+            alert('new password length is not enough');
+            $("#newPassword").focus();
+            return false;
+        }
+        if ($("#reNewPassword").val().trim().length < 6) {
+            alert('repeat new password length is not enough');
+            $("#reNewPassword").focus();
+            return false;
+        }
+        //后两个要相等
+        if ($("#newPassword").val() != $("#reNewPassword").val()) {
+            alert('新密码两次输入不一致!');
+            $("#reNewPassword").focus();
+            return false;
+        }
+
+
+        var postdata = {
+            origPassword:$("#origPassword").val(),
+            newPassword:$("#newPassword").val(),
+            reNewPassword:$("#reNewPassword").val()
+        }
+
+        var csrfToken = $("meta[name='_csrf']").attr("content");
+        var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+
+        $.ajax({
+            type:"POST",
+            url:"/set/setpassed",
+            data:postdata,
+            //返回数据的格式
+            datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".
+
+            beforeSend: function(request) {
+                request.setRequestHeader(csrfHeader, csrfToken); // 添加  CSRF Token
+            },
+            //成功返回之后调用的函数
+            success:function(data){
+                if (data.status == 0) {
+                    //
+                    alert('save success');
+
+                    window.location.href="/";
+                } else {
+                    alert("failed:"+data.msg);
+                }
+            },
+            //调用执行后调用的函数
+            complete: function(XMLHttpRequest, textStatus){
+            },
+            //调用出错执行的函数
+            error: function(){
+                //请求出错处理
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
